@@ -7,7 +7,7 @@ There are few settings to adjust for this app, simply open any markdown document
 You can install this app as a PWA on your mobile device, moreover, it is available as a browser extension as-well-as a web application:
 
 Chrome: https://chrome.google.com/webstore/detail/markdown-editor/kllaieliiilnenaeedlaffipnnijkefd  
-Edge:   
+Edge: https://microsoftedge.microsoft.com/addons/detail/ndeidhcmcnaijpbnddkllakncfgbbaei     
 Firefox: https://addons.mozilla.org/en-US/firefox/addon/markdown-editor-2/  
 Opera: https://addons.opera.com/en/extensions/details/markdown-editor/  
 Webapp & PWA: https://webbrowsertools.com/markdown-editor/
