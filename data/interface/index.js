@@ -30,12 +30,23 @@ var config  = {
       "mode": "text/x-markdown"
     }
   },
+  "download": function () {
+    const a = document.createElement('a');
+    const txt = config.codemirror.editor.getValue();
+    /*  */
+    a.style.display = "none";
+    a.setAttribute("download", "markdown.md");
+    a.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(txt));
+    document.body.appendChild(a);
+    a.click();
+    window.setTimeout(function () {document.body.removeChild(a)});
+  },
   "load": function () {
     config.container.input = document.querySelector(".input");
     config.container.output = document.querySelector(".output");
     /*  */
     config.storage.load(function () {
-      var storage = config.storage.read("markdown-options");
+      const storage = config.storage.read("markdown-options");
       config.markdown.options = storage !== undefined ? storage : config.markdown.options;
       /*  */
       config.app.start();
@@ -43,6 +54,24 @@ var config  = {
     });
     /*  */
     window.removeEventListener("load", config.load, false);
+  },
+  "resize": {
+    "timeout": null,
+    "method": function () {
+      if (config.port.name === "win") {
+        if (config.resize.timeout) window.clearTimeout(config.resize.timeout);
+        config.resize.timeout = window.setTimeout(async function () {
+          const current = await chrome.windows.getCurrent();
+          /*  */
+          config.storage.write("interface.size", {
+            "top": current.top,
+            "left": current.left,
+            "width": current.width,
+            "height": current.height
+          });
+        }, 1000);
+      }
+    }
   },
   "scroll": {
     "action": {
@@ -53,8 +82,8 @@ var config  = {
       const output = document.querySelector(".output");
       /*  */
       if (e.target && e.target.className) {
-        var left = e.target.className.toLowerCase().indexOf("codemirror-") !== -1;
-        var right = e.target.querySelector("div").className.toLowerCase().indexOf("output-") !== -1;
+        const left = e.target.className.toLowerCase().indexOf("codemirror-") !== -1;
+        const right = e.target.querySelector("div").className.toLowerCase().indexOf("output-") !== -1;
         /*  */
         if (right && config.scroll.action.left) {
           config.codemirror.editor.scrollTo(null, e.target.scrollTop);
@@ -66,11 +95,36 @@ var config  = {
       }
     }
   },
+  "storage": {
+    "local": {},
+    "read": function (id) {
+      return config.storage.local[id];
+    },
+    "load": function (callback) {
+      chrome.storage.local.get(null, function (e) {
+        config.storage.local = e;
+        callback();
+      });
+    },
+    "write": function (id, data) {
+      if (id) {
+        if (data !== '' && data !== null && data !== undefined) {
+          let tmp = {};
+          tmp[id] = data;
+          config.storage.local[id] = data;
+          chrome.storage.local.set(tmp, function () {});
+        } else {
+          delete config.storage.local[id];
+          chrome.storage.local.remove(id, function () {});
+        }
+      }
+    }
+  },
   "update": {
     "app": {
       "editor": function () {
         try {
-          var code = config.storage.read("markdown-code");
+          let code = config.storage.read("markdown-code");
           const compile = document.getElementById("compile");
           /*  */
           config.codemirror.editor = CodeMirror.fromTextArea(input, config.codemirror.options);
@@ -94,62 +148,11 @@ var config  = {
       }
     }
   },
-  "download": function () {
-    var a = document.createElement('a');
-    var txt = config.codemirror.editor.getValue();
-    /*  */
-    a.style.display = "none";
-    a.setAttribute("download", "markdown.md");
-    a.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(txt));
-    document.body.appendChild(a);
-    a.click();
-    window.setTimeout(function () {document.body.removeChild(a)});
-  },
-  "resize": {
-    "timeout": null,
-    "method": function () {
-      var context = document.documentElement.getAttribute("context");
-      if (context === "win") {
-        if (config.resize.timeout) window.clearTimeout(config.resize.timeout);
-        config.resize.timeout = window.setTimeout(function () {
-          config.storage.write("interface.size", {
-            "width": window.innerWidth || window.outerWidth,
-            "height": window.innerHeight || window.outerHeight
-          });
-        }, 300);
-      }
-    }
-  },
-  "storage": {
-    "local": {},
-    "read": function (id) {
-      return config.storage.local[id];
-    },
-    "load": function (callback) {
-      chrome.storage.local.get(null, function (e) {
-        config.storage.local = e;
-        callback();
-      });
-    },
-    "write": function (id, data) {
-      if (id) {
-        if (data !== '' && data !== null && data !== undefined) {
-          var tmp = {};
-          tmp[id] = data;
-          config.storage.local[id] = data;
-          chrome.storage.local.set(tmp, function () {});
-        } else {
-          delete config.storage.local[id];
-          chrome.storage.local.remove(id, function () {});
-        }
-      }
-    }
-  },
   "port": {
     "name": '',
     "connect": function () {
       config.port.name = "webapp";
-      var context = document.documentElement.getAttribute("context");
+      const context = document.documentElement.getAttribute("context");
       /*  */
       if (chrome.runtime) {
         if (chrome.runtime.connect) {
@@ -176,10 +179,10 @@ var config  = {
       "file": function (file, callback) {
         if (!file) return;
         /*  */
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.readAsText(file);
         reader.onload = function (e) {
-          var content = e.target.result;
+          const content = e.target.result;
           if (content) callback(content);
         };
       }
@@ -199,7 +202,7 @@ var config  = {
           compile.removeAttribute("disabled");
           download.removeAttribute("disabled");
           settings.removeAttribute("disabled");
-          var pre = document.createElement("pre");
+          const pre = document.createElement("pre");
           /*  */
           pre.textContent = JSON.stringify(e, null, 2);
           output.textContent = '';
@@ -211,6 +214,7 @@ var config  = {
       "to": {
         "markdown": {
           "document": function (txt, trusted, callback) {
+            const size = document.getElementById("size");
             const print = document.getElementById("print");
             const output = document.getElementById("output");
             const fileio = document.getElementById("fileio");
@@ -231,13 +235,13 @@ var config  = {
             window.setTimeout(function () {
               try {
                 config.markdown.options.highlight = function (code, lang) {
-                  var escapeHtml = config.markdown.html.utils.escapeHtml;
+                  const escapeHtml = config.markdown.html.utils.escapeHtml;
                   try {
                     if (lang && lang !== "auto" && hljs.getLanguage(lang)) {
-                      var result = hljs.highlight(code, {"language": lang, "ignoreIllegals": true});
+                      const result = hljs.highlight(code, {"language": lang, "ignoreIllegals": true});
                       return '<pre class="hljs language-' + escapeHtml(lang.toLowerCase()) + '"><code>' + result.value + '</code></pre>';
                     } else if (lang === "auto") {
-                      var result = hljs.highlightAuto(code);
+                      const result = hljs.highlightAuto(code);
                       return '<pre class="hljs language-' + escapeHtml(result.language) + '"><code>' + result.value + '</code></pre>';
                     }
                   } catch (e) {}
@@ -245,7 +249,7 @@ var config  = {
                   return '<pre class="hljs"><code>' + escapeHtml(code) + '</code></pre>';
                 };
                 /*  */
-                var options = config.markdown.options._strict ? "commonmark" : config.markdown.options;
+                const options = config.markdown.options._strict ? "commonmark" : config.markdown.options;
                 config.markdown.html = window.markdownit(options)
                   .use(window.markdownitIns)
                   .use(window.markdownitSub)
@@ -256,7 +260,7 @@ var config  = {
                   .use(window.markdownitDeflist)
                   .use(window.markdownitFootnote);
                 /*  */
-                var doc = config.parser.parseFromString(config.markdown.html.render(txt), "text/html");
+                const doc = config.parser.parseFromString(config.markdown.html.render(txt), "text/html");
                 /*  */
                 fileio.disabled = false;
                 print.removeAttribute("disabled");
@@ -267,7 +271,9 @@ var config  = {
                 /*  */
                 output.textContent = '';
                 output.removeAttribute("empty");
-                var nodes = [...doc.body.childNodes];
+                output.style.fontSize = size.value + "px";
+                /*  */
+                const nodes = [...doc.body.childNodes];
                 nodes.map(function (node) {output.appendChild(node)});
                 /*  */
                 config.container.buttons.map(function (button) {
@@ -277,13 +283,16 @@ var config  = {
                 });
                 /*  */
                 callback(true);
-              } catch (e) {config.app.show.error.message(e)}
+              } catch (e) {
+                config.app.show.error.message(e);
+              }
             }, (trusted ? 300 : 0));
           }
         }
       }
     },
     "start": function () {
+      const size = document.getElementById("size");
       const print = document.getElementById("print");
       const fileio = document.getElementById("fileio");
       const reload = document.getElementById("reload");
@@ -294,6 +303,7 @@ var config  = {
       const settings = document.getElementById("settings");
       /*  */
       download.addEventListener("click", config.download, false);
+      size.value = config.storage.read("size") !== undefined ? config.storage.read("size") : 14;
       /*  */
       print.addEventListener("click", function () {
         window.print();
@@ -304,13 +314,20 @@ var config  = {
       }, false);
       /*  */
       support.addEventListener("click", function () {
-        var url = config.addon.homepage();
+        const url = config.addon.homepage();
         chrome.tabs.create({"url": url, "active": true});
       }, false);
       /*  */
       donation.addEventListener("click", function () {
-        var url = config.addon.homepage() + "?reason=support";
+        const url = config.addon.homepage() + "?reason=support";
         chrome.tabs.create({"url": url, "active": true});
+      }, false);
+      /*  */
+      size.addEventListener("change", function (e) {
+        config.storage.write("size", e.target.value);
+        window.setTimeout(function () {
+          compile.click();
+        }, 300);
       }, false);
       /*  */
       config.container.input.addEventListener("mouseover", function () {
@@ -330,16 +347,16 @@ var config  = {
       }, false);
       /*  */
       compile.addEventListener("click", function (e) {
-        var txt = config.codemirror.editor.getValue();
+        const txt = config.codemirror.editor.getValue();
         config.app.compile.to.markdown.document(txt, e.isTrusted, function () {
-          var output = document.querySelector(".output");
+          const output = document.querySelector(".output");
           output.scrollTop = config.codemirror.editor.getScrollInfo().top;
         });
       }, false);
       /*  */
       settings.addEventListener("click", function () {
-        var target = document.querySelector(".settings");
-        var open = target.getAttribute("open");
+        const target = document.querySelector(".settings");
+        const open = target.getAttribute("open");
         /*  */
         if (open !== null) {
           target.removeAttribute("open");
@@ -355,7 +372,7 @@ var config  = {
         }
         /*  */
         button.addEventListener("change", function (e) {
-          var tmp = config.markdown.options;
+          let tmp = config.markdown.options;
           tmp[e.target.id] = e.target.checked;
           config.markdown.options = tmp;
           /*  */

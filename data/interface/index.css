@@ -53,7 +53,7 @@ table tr td[disabled] {
 }
 
 .fileio table tr td svg, .toolbar table tr td svg {
-  fill: #676767;
+  fill: #555;
   pointer-events: none;
   vertical-align: middle;
 }
@@ -68,8 +68,7 @@ table tr td[disabled] {
   width: 100%;
   margin: auto;
   outline: none;
-  cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   overflow: hidden;
   background: #fff;
   text-align: center;
@@ -83,6 +82,23 @@ table tr td[disabled] {
   width: 250px;
   background-color: #fff !important;
   border-right: solid 1px rgba(0,0,0,0.1);
+}
+
+.fileio .number {
+  width: 58px;
+}
+
+.fileio .number:hover {
+  background-color: #fff;
+}
+
+.fileio .file input {
+  cursor: pointer;
+}
+
+.fileio .number input {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -118,7 +134,7 @@ h1, h2, h3, h4, h5, h6 {
 .settings label {
   color: #555;
   padding: 5px;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   margin: 0 5px 0 0;
   user-select: none;
@@ -151,7 +167,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #333;
   height: 100%;
   outline: none;
-  font-size: 12px;
+  font-size: 13px;
   background-color: #fff;
   font-family: monospace;
 }
@@ -162,7 +178,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .input .CodeMirror {
   height: 100%;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 14px;
 }
 
@@ -172,7 +188,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .output pre {
   color: #555;
-  font-size: 12px;
+  font-size: 13px;
   padding: 2px 5px;
   line-height: 1.5;
   text-align: left;
@@ -186,9 +202,10 @@ h1, h2, h3, h4, h5, h6 {
 .output div {
   padding: 0;
   margin: auto;
-  height: 100%;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 12px;
+  height: fit-content;
+  padding-bottom: 10px;
   color: rgb(51, 51, 51);
   box-sizing: border-box;
   width: calc(100% - 20px);
