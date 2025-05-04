@@ -39,26 +39,31 @@ table tr td[disabled] {
   height: 100%;
 }
 
-.fileio table, .toolbar table {
+.fileio table,
+.toolbar table {
   border-spacing: 0;
 }
 
-.fileio table tr td, .toolbar table tr td {
+.fileio table tr td,
+.toolbar table tr td {
   padding: 0;
   width: 48px;
   height: 48px;
   cursor: pointer;
   user-select: none;
   text-align: center;
+  transition: 300ms ease background-color;
 }
 
-.fileio table tr td svg, .toolbar table tr td svg {
+.fileio table tr td svg,
+.toolbar table tr td svg {
   fill: #555;
   pointer-events: none;
   vertical-align: middle;
 }
 
-.fileio table tr td:hover, .toolbar table tr td:hover {
+.fileio table tr td:hover,
+.toolbar table tr td:hover {
   background-color: rgba(0,0,0,0.05);
 }
 
@@ -257,14 +262,125 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-@-moz-document url-prefix() {
-  .fileio input,
-  .settings label,
-  .input textarea, .output div {
-    font-family: monaco, "andale mono", "lucida console", "courier new", monospace;
-  }
-}
-
 html[context="webapp"] .toolbar {
   display: none;
+}
+
+html[theme='dark'], 
+html[theme='dark'] body {
+  color: #ebebeb;
+  color-scheme: dark;
+  background-color: #1e1e1e;
+}
+
+html[theme='dark'] .input,
+html[theme='dark'] .output,
+html[theme='dark'] .output div,
+html[theme='dark'] .fileio input,
+html[theme='dark'] .fileio .white,
+html[theme='dark'] .input textarea {
+  color: #ebebeb;
+  background-color: #1e1e1e !important;
+}
+
+html[theme='dark'] .settings,
+html[theme='dark'] .output pre,
+html[theme='dark'] .settings label {
+  color: #ebebeb;
+}
+
+html[theme='dark'] .cm-s-lesser-dark span.cm-tag {
+  color: #59a990;
+}
+
+html[theme='dark'] .cm-s-lesser-dark span.cm-link {
+  color: #8383ff;
+}
+
+html[theme='dark'] .cm-s-lesser-dark span.cm-header {
+  color: #dd37dd;
+}
+
+html[theme='dark'] .cm-s-lesser-dark span.cm-comment {
+  color: #8d8d8d;
+}
+
+html[theme='dark'] .output pre {
+  border-color: rgb(255 255 255 / 50%);
+}
+
+html[theme='dark'] .input,
+html[theme='dark'] .output,
+html[theme='dark'] .settings,
+html[theme='dark'] .fileio .white {
+  border-color: rgb(255 255 255 / 15%);
+}
+
+html[theme='dark'] .settings {
+  background-color: rgb(0 0 0 / 50%);
+}
+
+html[theme='dark'] .fileio table tr td:hover,
+html[theme='dark'] .toolbar table tr td:hover {
+  background-color: rgba(255 255 255 / 5%);
+}
+
+html[theme='dark'] .fileio .number:hover {
+  background-color: #1e1e1e;
+}
+
+html[theme='dark'] .fileio table tr td svg,
+html[theme='dark'] .toolbar table tr td svg {
+  fill: #ebebeb;
+}
+
+html[theme='dark'] .hljs {
+  color: #ddd;
+  background: #303030
+}
+
+html[theme='dark'] .hljs-link,
+html[theme='dark'] .hljs-keyword,
+html[theme='dark'] .hljs-literal,
+html[theme='dark'] .hljs-section,
+html[theme='dark'] .hljs-selector-tag {
+  color: white
+}
+
+html[theme='dark'] .hljs-type,
+html[theme='dark'] .hljs-name,
+html[theme='dark'] .hljs-title,
+html[theme='dark'] .hljs-string,
+html[theme='dark'] .hljs-symbol,
+html[theme='dark'] .hljs-bullet,
+html[theme='dark'] .hljs-built_in,
+html[theme='dark'] .hljs-addition,
+html[theme='dark'] .hljs-variable,
+html[theme='dark'] .hljs-attribute,
+html[theme='dark'] .hljs-template-tag,
+html[theme='dark'] .hljs-template-variable {
+  color: #d88
+}
+
+html[theme='dark'] .hljs-meta,
+html[theme='dark'] .hljs-quote,
+html[theme='dark'] .hljs-comment,
+html[theme='dark'] .hljs-deletion {
+  color: #979797
+}
+
+html[theme='dark'] .hljs-name,
+html[theme='dark'] .hljs-type,
+html[theme='dark'] .hljs-title,
+html[theme='dark'] .hljs-doctag,
+html[theme='dark'] .hljs-strong,
+html[theme='dark'] .hljs-section,
+html[theme='dark'] .hljs-literal,
+html[theme='dark'] .hljs-keyword,
+html[theme='dark'] .hljs-selector-tag {
+  font-weight: bold
+}
+
+html[theme='dark'] .hljs-emphasis {
+  font-style: italic
 }

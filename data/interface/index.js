@@ -39,7 +39,9 @@ var config  = {
     a.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(txt));
     document.body.appendChild(a);
     a.click();
-    window.setTimeout(function () {document.body.removeChild(a)});
+    window.setTimeout(function () {
+      document.body.removeChild(a);
+    });
   },
   "load": function () {
     config.container.input = document.querySelector(".input");
@@ -120,34 +122,6 @@ var config  = {
       }
     }
   },
-  "update": {
-    "app": {
-      "editor": function () {
-        try {
-          let code = config.storage.read("markdown-code");
-          const compile = document.getElementById("compile");
-          /*  */
-          config.codemirror.editor = CodeMirror.fromTextArea(input, config.codemirror.options);
-          config.codemirror.editor.on("change", function () {compile.click()});
-          /*  */
-          if (code !== undefined) {
-            code = window.atob(code);
-            config.codemirror.editor.setValue(code);
-            window.setTimeout(function () {compile.click()}, 300);
-          } else {
-            fetch("resources/test.md").then(function (e) {return e.text()}).then(function (e) {
-              if (e) {
-                config.codemirror.editor.setValue(e);
-                window.setTimeout(function () {compile.click()}, 300);
-              }
-            }).catch(function () {
-              config.app.show.error.message("Error: could not find the input .md file!");
-            });
-          }
-        } catch (e) {config.app.show.error.message(e)}
-      }
-    }
-  },
   "port": {
     "name": '',
     "connect": function () {
@@ -172,6 +146,48 @@ var config  = {
       }
       /*  */
       document.documentElement.setAttribute("context", config.port.name);
+    }
+  },
+  "update": {
+    "app": {
+      "editor": function () {
+        try {
+          let code = config.storage.read("markdown-code");
+          const compile = document.getElementById("compile");
+          const theme = config.storage.read("theme") !== undefined ? config.storage.read("theme") : "light";
+          /*  */
+          config.codemirror.editor = CodeMirror.fromTextArea(input, config.codemirror.options);
+          config.codemirror.editor.on("change", function () {
+            compile.click();
+          });
+          /*  */
+          document.documentElement.setAttribute("theme", theme !== undefined ? theme : "light");
+          config.codemirror.editor.setOption("theme", theme === "dark" ? "lesser-dark" : "default");
+          /*  */
+          if (code !== undefined) {
+            code = window.atob(code);
+            config.codemirror.editor.setValue(code);
+            window.setTimeout(function () {
+              compile.click();
+            }, 300);
+          } else {
+            fetch("resources/test.md").then(function (e) {
+              return e.text();
+            }).then(function (e) {
+              if (e) {
+                config.codemirror.editor.setValue(e);
+                window.setTimeout(function () {
+                  compile.click();
+                }, 300);
+              }
+            }).catch(function () {
+              config.app.show.error.message("Error: could not find the input .md file!");
+            });
+          }
+        } catch (e) {
+          config.app.show.error.message(e);
+        }
+      }
     }
   },
   "app": {
@@ -294,6 +310,7 @@ var config  = {
     "start": function () {
       const size = document.getElementById("size");
       const print = document.getElementById("print");
+      const theme = document.getElementById("theme");
       const fileio = document.getElementById("fileio");
       const reload = document.getElementById("reload");
       const compile = document.getElementById("compile");
@@ -302,8 +319,9 @@ var config  = {
       const download = document.getElementById("download");
       const settings = document.getElementById("settings");
       /*  */
-      download.addEventListener("click", config.download, false);
       size.value = config.storage.read("size") !== undefined ? config.storage.read("size") : 14;
+      /*  */
+      download.addEventListener("click", config.download, false);
       /*  */
       print.addEventListener("click", function () {
         window.print();
@@ -323,27 +341,17 @@ var config  = {
         chrome.tabs.create({"url": url, "active": true});
       }, false);
       /*  */
+      fileio.addEventListener("change", function (e) {
+        config.app.process.file(e.target.files[0], function (txt) {
+          config.codemirror.editor.setValue(txt);
+        });
+      }, false);
+      /*  */
       size.addEventListener("change", function (e) {
         config.storage.write("size", e.target.value);
         window.setTimeout(function () {
           compile.click();
         }, 300);
-      }, false);
-      /*  */
-      config.container.input.addEventListener("mouseover", function () {
-        config.scroll.action.left = false;
-        config.scroll.action.right = true;
-      }, false);
-      /*  */
-      config.container.output.addEventListener("mouseover", function () {
-        config.scroll.action.left = true;
-        config.scroll.action.right = false;
-      }, false);
-      /*  */
-      fileio.addEventListener("change", function (e) {
-        config.app.process.file(e.target.files[0], function (txt) {
-          config.codemirror.editor.setValue(txt);
-        });
       }, false);
       /*  */
       compile.addEventListener("click", function (e) {
@@ -352,6 +360,15 @@ var config  = {
           const output = document.querySelector(".output");
           output.scrollTop = config.codemirror.editor.getScrollInfo().top;
         });
+      }, false);
+      /*  */
+      theme.addEventListener("click", function () {
+        let attribute = document.documentElement.getAttribute("theme");
+        attribute = attribute === "dark" ? "light" : "dark";
+        /*  */
+        document.documentElement.setAttribute("theme", attribute);
+        config.codemirror.editor.setOption("theme", attribute === "dark" ? "lesser-dark" : "default");
+        config.storage.write("theme", attribute);
       }, false);
       /*  */
       settings.addEventListener("click", function () {
@@ -363,6 +380,16 @@ var config  = {
         } else {
           target.setAttribute("open", '');
         }
+      }, false);
+      /*  */
+      config.container.input.addEventListener("mouseover", function () {
+        config.scroll.action.left = false;
+        config.scroll.action.right = true;
+      }, false);
+      /*  */
+      config.container.output.addEventListener("mouseover", function () {
+        config.scroll.action.left = true;
+        config.scroll.action.right = false;
       }, false);
       /*  */
       config.container.buttons = [...document.querySelector(".settings").querySelectorAll("input")];
