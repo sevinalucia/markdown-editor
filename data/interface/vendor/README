@@ -1,10 +1,10 @@
 This app uses the following open-source JavaScript libraries:
 
 A. CodeMirror
-vendor/codemirror/(*): https://cdn.jsdelivr.net/npm/codemirror@5.65.19/
+vendor/codemirror/(*): https://cdn.jsdelivr.net/npm/codemirror@5.65.21/
 
 B. Markdown-it
-1. vendor/markdown/markdown-it.js >> https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.js
+1. vendor/markdown/markdown-it.js >> https://cdn.jsdelivr.net/npm/markdown-it@14.1.1/dist/markdown-it.js
 
 C. Highlightjs
 1. vendor/highlight/highlight.js >> https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.js
